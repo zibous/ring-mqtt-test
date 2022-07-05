@@ -39,6 +39,8 @@ def getTimestamp() -> string:
 ROOTPATH = path.dirname(path.abspath(__file__))
 DATADIR = os.path.join(ROOTPATH, 'data/')
 LOG_DIR = os.path.join(ROOTPATH, 'logs/')
+IMG_DIR = os.path.join(ROOTPATH, 'images/')
+
 
 # Default Global settings logger for all modules
 LOG_DIR = None
@@ -57,3 +59,14 @@ MQTT_KEEPALIVE = 60
 RING_IMAGE = "ring/****/camera/54e019cfa225/snapshot/image"
 RING_TIME = "ring/***/camera/54e019cfa225/snapshot/attributes"
 RING_MOTION = "ring/***/camera/54e019cfa225/motion/state"
+RING_DING = "ring/***/camera/54e019cfa225/ding/state"
+
+# ffmpeg -y -rtsp_transport tcp -i rtsp://IP:PORT/ID_live -s 640x360 -vframes 1 last_motion.jpg
+RTSP_URL = "rtsp://IPADDRESS:PORT/ID_live"
+WAIT_TIME = 1
+IMG_FRAME = 1
+IMG_SIZE = 720
+IMG_TIME = "%Y%m%d-%H%M%S"
+IMG_EXT = "jpg"
+
+
