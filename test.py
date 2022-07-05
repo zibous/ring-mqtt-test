@@ -30,45 +30,6 @@ except Exception as e:
     sys.exit(1)
 
 
-def test():
-    arg1 = "{}lastmotion_{}.{}".format(config.IMG_DIR, time.strftime(config.IMG_TIME), config.IMG_EXT)
-    subprocess.call(["{}/getSnapshoot.sh".format(config.ROOTPATH), arg1])
-
-
-def testcase():
-
-    fontfile = "/usr/share/fonts/truetype/freefont/FreeSans.ttf"
-
-    try:
-
-        if sys.platform.startswith("linux"):  # could be "linux", "linux2", "linux3", ...
-           # linux get the snapshoot
-            (
-                ffmpeg
-                .input(config.RTSP_URL, ss=0)
-                .filter('scale', 720, -1)
-                .filter("drawtext", "fontfile=/usr/share/fonts/truetype/freefont/FreeSans.ttf:fontcolor=white:fontsize=36:x=40:y=1000:text='%{localtime\:%Y.%m.%d %H\\\\\:%M\\\\\:%S}'")
-                .output('test-mage.jpg', vframes=1)
-                .overwrite_output()
-                .run()
-            )
-        if sys.platform == "darwin":
-            # MAC OS X get the snapshoot
-            (
-                ffmpeg
-                .input(config.RTSP_URL, ss=0)
-                .filter('scale', 720, -1)
-                .filter("drawtext", "fontfile=/Users/petsie1612/Library/Fonts/FreeSans.ttf:fontcolor=white:fontsize=36:x=40:y=1000:text='%{localtime\:%Y.%m.%d %H\\\\\:%M\\\\\:%S}'")
-                .output('test-mage.jpg', vframes=1)
-                .overwrite_output()
-                .run()
-            )
-
-    except ffmpeg.Error as e:
-        print(e.stderr.decode(), file=sys.stderr)
-        sys.exit(1)
-
-
 def snapshoot_image(filename: str = "", mode: int = 1):
     if filename and mode > 0:
         if mode == 1:
@@ -79,7 +40,7 @@ def snapshoot_image(filename: str = "", mode: int = 1):
                     ffmpeg
                     .input(config.RTSP_URL, ss=0)
                     .filter('scale', config.IMG_SIZE, -1)
-                    # .filter("drawtext", "fontfile=/Users/petsie1612/Library/Fonts/FreeSans.ttf:fontcolor=white:fontsize=36:x=40:y=1000:text='%{localtime\:%Y.%m.%d %H\\\\\:%M\\\\\:%S}'")
+                    # .filter("drawtext", "fontfile=/usr/share/fonts/truetype/freefont/FreeSans.ttf:fontcolor=white:fontsize=36:x=40:y=1000:text='%{localtime\:%Y.%m.%d %H\\\\\:%M\\\\\:%S}'")
                     .output(filename, vframes=config.IMG_FRAME)
                     .overwrite_output()
                     .run(capture_stdout=True, capture_stderr=True)
