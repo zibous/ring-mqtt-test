@@ -15,9 +15,9 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
     -i rtsp://10.1.1.217:8554/54e019cfa225_live \
     -s 640x360  \
     -vframes 1 \
-    -vf drawtext="fontfile=/Users/petsie1612/Library/Fonts/FreeSans.ttf:\
+    -vf drawtext="fontfile=/usr/share/fonts/truetype/freefont/FreeSans.ttf:\
                 fontcolor=white:fontsize=38:x=40:y=1000: \
-                text='Snapshoot %{localtime\:%Y.%m.%d %H\\\\\:%M\\\\\:%S}'"  \
+                text='Snapshoot  %{localtime\:%Y.%m.%d %H\\\\\:%M\\\\\:%S}'"  \
     $1
 
 elif [[ "$OSTYPE" == "darwin"* ]]; then
@@ -29,9 +29,9 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
     -i rtsp://10.1.1.217:8554/54e019cfa225_live \
     -s 640x360  \
     -vframes 1 \
-    -vf drawtext="fontfile=/usr/share/fonts/truetype/freefont/FreeSans.ttf:\
+    -vf drawtext="fontfile=/Users/petsie1612/Library/Fonts/FreeSans.ttf:\
                 fontcolor=white:fontsize=38:x=40:y=1000: \
-                text='Snapshoot  %{localtime\:%Y.%m.%d %H\\\\\:%M\\\\\:%S}'"  \
+                text='Snapshoot %{localtime\:%Y.%m.%d %H\\\\\:%M\\\\\:%S}'"  \
     $1
 else
    echo "not supported..."
