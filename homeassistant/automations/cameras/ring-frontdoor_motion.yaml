@@ -1,0 +1,27 @@
+# --------------------------------------------------
+# save image ring doorbell on motion
+# --------------------------------------------------
+
+- id: "2022062914500"
+
+  alias: Hauseingang Kamera Bewegungsmeldung
+  description: "Speichert die Kamerabilder von Hauseingang, wenn eine Bewegung erkannt wird."
+  initial_state: true
+
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.kamera_haustur_motion_2
+      to: "on"
+
+  condition: []
+
+  action:
+    - service: script.alexamessage
+      data:
+        message: "Security meldet, Bewegung beim Hauseingang bemerkt"
+
+    - service: script.save_ring_snapshoot
+      data:
+        mode: "bewegung"
+
+  mode: single

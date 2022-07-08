@@ -1,0 +1,30 @@
+# --------------------------------------------------
+# save image ring doorbell on ding
+# --------------------------------------------------
+
+- id: "2022062914501"
+
+  alias: Hauseingang Glocke Meldung
+  description: "Speichert das Kamerabild der Hauseingang Kamera, wenn die Klingel betätig wird"
+  initial_state: true
+
+  trigger:
+    - type: occupied
+      platform: device
+      device_id: bed8074d04bfd41f2a863e4f1dcf6e49
+      entity_id: binary_sensor.haustur_ding
+      domain: binary_sensor
+
+  condition: []
+
+  action:
+
+    - service: script.alexamessage
+      data:
+        message: "Hausmeister meldet, ein Besucher läutet an der Haustür."
+
+    - service: script.save_ring_snapshoot
+      data:
+        mode: "glocke"
+
+  mode: single

@@ -1,0 +1,86 @@
+## call ####################################
+##  - service: script.save_ring_snapshoot
+#     data:
+#       mode: "glocke|bewegung"
+
+save_ring_snapshoot:
+
+  alias: "Speichert eine Bild von der Ring Doorbell Kamera bei Bewegung oder wenn die Glocke betätigt wird"
+  max_exceeded: silent
+
+  variables:
+    timestamp: "{{now().strftime('%Y-%m-%d %H:%M:%S')}}"
+    filename: "/media/hauseingang/{{now().strftime('%Y%m%d%H%M%S')}}_{{mode}}.jpg"
+    webimage: "https://webserver.local/ringcam/hauseingang/{{now().strftime('%Y%m%d%H%M%S')}}_{{mode}}.jpg"
+    motiontime: "{{ states.binary_sensor.kamera_haustur_motion_2.attributes.lastMotion | timestamp_custom('%Y-%m-%d %H:%M:%S') }}"
+  sequence:
+
+    - delay: 00:00:01
+
+    ## see: https://www.home-assistant.io/docs/scripts/#wait-for-a-template
+    - wait_template: >-
+        {{((states.camera.haustur_snapshot.attributes.timestamp|int >= states.binary_sensor.kamera_haustur_motion_2.attributes.lastMotion))}}
+      timeout: '00:05:00'
+      continue_on_timeout: true
+
+    - choose:
+
+      - conditions:
+          - condition: template
+            value_template: '{{ not wait.completed }}'
+        sequence:
+        - service: counter.increment
+          entity_id: counter.frontdoor_motion
+
+      default:
+        - service: camera.snapshot
+          data:
+            entity_id: camera.haustur_snapshot
+            filename: "{{ filename }}"
+
+        - service: system_log.write
+          data_template:
+            message: "{{filename}} gespeichert"
+            level: warning
+            logger: syslog_message
+
+        - service: notify.gotify_message
+          data:
+            title: "Sicherheitsmeldung Hauseingang"
+            message: |
+              ![Hauseingang Kamerabild]({{webimage}})
+              {{mode | capitalize}} am: **{{motiontime}}** {{'\n'}}
+              Bild vom   : **{{ states.camera.haustur_snapshot.attributes.timestamp | timestamp_custom('%Y-%m-%d %H:%M:%S') }}** {{'\n'}}
+              Erstellt am: **{{timestamp}}** {{'\n'}}
+              Verarbeitet: **{{now().strftime('%Y-%m-%d %H:%M:%S')}}**
+
+        - service: mqtt.publish
+          data_template:
+            topic: "security/sensor/frontdoor/{{mode}}"
+            retain: false
+            payload: >-
+              {
+              "timestamp": "{{timestamp}}",
+              "state": "on",
+              "status": "{{mode}}",
+              "location": "frontdoor",
+              "filename": "{{filename}}",
+              "motionstate":  "{{states.binary_sensor.kamera_haustur_motion_2.state}}",
+              "ringmotion":   "{{states.binary_sensor.haustur_motion.state}}",
+              "motiontime":   "{{ motiontime }}",
+              "lastupdate":   "{{states.camera.haustur_snapshot.attributes.timestamp | timestamp_custom('%Y-%m-%dT%H:%M:%S', False)}}",
+              "snapshotTime": "{{ states.camera.haustur_snapshot.attributes.timestamp | timestamp_custom('%Y-%m-%d %H:%M:%S') }}",
+              "delay":        "{{(states.camera.haustur_snapshot.attributes.timestamp|float(0.00)-states.binary_sensor.kamera_haustur_motion_2.attributes.lastMotion)|float(0.00)/60}}",
+              "sensor": "kamera_haustur_motion_2",
+              "device": "Ring Doorbell",
+              "operator": "script.saveRingSnapshoot",
+              "version": "1.0.0",
+              "attribution": "Automation Ring Frontdoor - kamera_haustur_motion_2"
+              }
+
+        - service: delete.files_in_folder
+          data:
+            folder: "/media/hauseingang/"
+            time: 604800
+            except_files:
+              - "last_*.jpg"

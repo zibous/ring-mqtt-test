@@ -1,0 +1,47 @@
+- id: "202206291508"
+
+  alias: Wintergarten Kamera Snapshots erstellen
+  description: "Speichert die Kamerabilder von Garten, wenn eine Bewegung erkannt wird."
+  initial_state: true
+
+  trigger:
+    - platform: state
+      entity_id: sensor.motion_sensor_garten_contact
+      to: "aktiv"
+
+  condition: []
+
+  variables:
+    timestamp: "{{now().strftime('%Y-%m-%d %H:%M:%S')}}"
+    gootifyImage: "{{now().strftime('%Y%m%d%H%M%S')}}_wintergartencam.jpg"
+    filename: "/media/garten/{{gootifyImage}}"
+    eventId: "{{trigger.entity_id}}"
+    meldung: "Garten Video {{filename}} gespeichert: {{timestamp}}, ausgelöst durch {{eventId}} !"
+    image: "https://webserver.local/ringcam/garten/{{gootifyImage}}"
+
+  action:
+    - service: delete.files_in_folder
+      data:
+        folder: "/media/garten/"
+        time: 604800
+        except_files:
+          - "last_motion.jpg"
+
+    - service: camera.snapshot
+      target:
+        entity_id: camera.kamera_wintergarten
+      data:
+        filename: "{{filename}}"
+
+    - service: system_log.write
+      data_template:
+        message: "{{meldung}}"
+        level: warning
+        logger: syslog_message
+
+    - service: notify.gotify_message
+      data:
+        title: "Sicherheitsmeldung Garten Bewegung"
+        message: "![Sicherheit Garten Kamerabild]({{image}}) \n\n Bewegung im Garten um {{timestamp}}"
+
+  mode: single
