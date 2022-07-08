@@ -1,6 +1,14 @@
 ## RING MQTT Testcase
 
 
+## Result - NO security with RING Doorbell !
+
+After a few attempts, I have to realize that it is only possible to save a camera image to a limited extent with the Ring service when motion is detected. Sometimes it works, sometimes it saves the wrong image.
+
+The Ring APP (Android version) has the same problem. Even there, the corresponding image is not always displayed when motion is detected.
+
+
+
 ![Hauseingang Kamerabild](images/gotify_message.png)
 
 ## Requirements
