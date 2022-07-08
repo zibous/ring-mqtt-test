@@ -13,13 +13,12 @@ save_ring_snapshoot:
     filename: "/media/hauseingang/{{now().strftime('%Y%m%d%H%M%S')}}_{{mode}}.jpg"
     webimage: "https://webserver.local/ringcam/hauseingang/{{now().strftime('%Y%m%d%H%M%S')}}_{{mode}}.jpg"
     motiontime: "{{ states.binary_sensor.kamera_haustur_motion_2.attributes.lastMotion | timestamp_custom('%Y-%m-%d %H:%M:%S') }}"
+    current_timstamp : "{{ as_timestamp(now())|int}}"
+	  
   sequence:
 
-    - delay: 00:00:01
-
-    ## see: https://www.home-assistant.io/docs/scripts/#wait-for-a-template
     - wait_template: >-
-        {{((states.camera.haustur_snapshot.attributes.timestamp|int >= states.binary_sensor.kamera_haustur_motion_2.attributes.lastMotion))}}
+        {{ states.camera.haustur_snapshot.attributes.timestamp|int >= as_timestamp(now())|int}}
       timeout: '00:05:00'
       continue_on_timeout: true
 
@@ -67,14 +66,16 @@ save_ring_snapshoot:
               "filename": "{{filename}}",
               "motionstate":  "{{states.binary_sensor.kamera_haustur_motion_2.state}}",
               "ringmotion":   "{{states.binary_sensor.haustur_motion.state}}",
-              "motiontime":   "{{ motiontime }}",
+              "motiontime":   "{{ current_timstamp }}",
+              "snapshoottime":   "{{ states.camera.haustur_snapshot.attributes.timestamp }}",
+              "lastmotiontime":  "{{ motiontime }}",
               "lastupdate":   "{{states.camera.haustur_snapshot.attributes.timestamp | timestamp_custom('%Y-%m-%dT%H:%M:%S', False)}}",
               "snapshotTime": "{{ states.camera.haustur_snapshot.attributes.timestamp | timestamp_custom('%Y-%m-%d %H:%M:%S') }}",
               "delay":        "{{(states.camera.haustur_snapshot.attributes.timestamp|float(0.00)-states.binary_sensor.kamera_haustur_motion_2.attributes.lastMotion)|float(0.00)/60}}",
               "sensor": "kamera_haustur_motion_2",
               "device": "Ring Doorbell",
               "operator": "script.saveRingSnapshoot",
-              "version": "1.0.0",
+              "version": "1.0.1",
               "attribution": "Automation Ring Frontdoor - kamera_haustur_motion_2"
               }
 
