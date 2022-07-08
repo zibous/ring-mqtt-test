@@ -8,7 +8,7 @@ Ring MQTT (ring-mqtt:4.9.1)
 see: https://github.com/tsightler/ring-mqtt
 
 ## Hardware
-Video Doorbell Wired (no Ring Protect Plan)
+Video Doorbell Wired + Chime (no Ring Protect Plan)
 
 
 ## Docker Install
